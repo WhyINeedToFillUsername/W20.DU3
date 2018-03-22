@@ -21,11 +21,14 @@ http.createServer(function (req, res) {
     // all data have been received
     req.on('end', function () {
         if (req.method === "DELETE") {
-            res.writeHead(processRequest(req));
+            processDeleteRequest(req, res);
+            res.end();
+        } else if (req.method === "GET") {
+            res.writeHead(processGetRequest(req));
             res.end();
         } else {
             res.writeHead(405);
-            console.log("bad request");
+            console.log("method not allowed");
             res.end('bad request');
         }
     });
@@ -34,7 +37,7 @@ http.createServer(function (req, res) {
         console.log("Waiting for confirmation...\n");
         setTimeout(function () {
             console.log("confirmed, deleting customer with id: " + id);
-            if (storage.deleteCustomerById(id)){
+            if (storage.deleteCustomerById(id)) {
                 console.log("successfully deleted " + id);
             } else {
                 console.log(id + " already deleted");
@@ -45,7 +48,7 @@ http.createServer(function (req, res) {
         }, 10000)
     }
 
-    function processRequest(req) {
+    function processDeleteRequest(req, res) {
         let subQuery = req.url.match("^/customer/(\\d+)?$");
         let id = parseInt(subQuery[1]);
 
@@ -53,14 +56,28 @@ http.createServer(function (req, res) {
             let i = storage.getCustomerIndex(id);
             if (i === null) {
                 console.log("book with id " + id + " not found");
-                return 404;
+                res.writeHead(404);
             } else {
                 console.log("Deleting customer with id " + id + "...");
+                let reqId = storage.createDeleteRequest(id);
                 confirmDeletion(id); // this will be done asynchronously
-                return 202;
+                res.writeHead(202, {'Location': '/request/' + reqId});
             }
+        } else {
+            console.log("bad request");
+            res.writeHead(400);
         }
-        console.log("bad request");
-        return 400;
+    }
+
+    function processGetRequest(req) {
+        let i = storage.getCustomerIndex(id);
+        if (i === null) {
+            console.log("book with id " + id + " not found");
+            return 404;
+        } else {
+            console.log("Deleting customer with id " + id + "...");
+            confirmDeletion(id); // this will be done asynchronously
+            return 202;
+        }
     }
 }).listen(8080);

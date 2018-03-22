@@ -1,4 +1,14 @@
 exports.storage = {
+
+    requestId: 0,
+
+    requests: [],
+
+    createDeleteRequest: function (customerId) {
+        this.requests.push({id: this.requestId, customerId: customerId, deleted: false});
+        return this.requestId++;
+    },
+
     customers: [
         {id: 1, name: "Harry Potter"},
         {id: 2, name: "J. K. Rowling"},
