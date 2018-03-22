@@ -9,6 +9,19 @@ exports.storage = {
         return this.requestId++;
     },
 
+    // getRequestIndex: function (customerId) {
+    //     for (let i = 0; i < this.requests.length; i++)
+    //         if (this.requests[i].customerId === customerId) return i;
+    //     return null;
+    // },
+
+    closeRequestByCustomerId: function (customerId) {
+        for (let i = 0; i < this.requests.length; i++)
+            if (this.requests[i].customerId === customerId)
+                this.requests[i].deleted = true;
+        return null;
+    },
+
     customers: [
         {id: 1, name: "Harry Potter"},
         {id: 2, name: "J. K. Rowling"},

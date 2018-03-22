@@ -1,7 +1,7 @@
 const http = require("http");
 const storage = require("./storage").storage;
 
-const DELETION_TIMEOUT = 10000;
+const DELETION_TIMEOUT = 5000;//TODO leave at 10000
 
 http.createServer(function (req, res) {
     // log request object
@@ -45,11 +45,15 @@ http.createServer(function (req, res) {
             console.log("confirmed, deleting customer with id: " + id);
             if (storage.deleteCustomerById(id)) {
                 console.log("successfully deleted " + id);
+                storage.closeRequestByCustomerId(id);
             } else {
                 console.log(id + " already deleted");
             }
             console.log("remaining customers:");
             console.log(storage.customers);
+            console.log();
+            console.log("remaining requests:");
+            console.log(storage.requests);
             console.log();
         }
     }
