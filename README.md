@@ -1,6 +1,8 @@
 # W20.DU4
 Homework 4 of the W20 class at FIT CTU.
 
+## How to run
+This is a node.js server. Simply run by command ``node du4.js``.
 
 ## Assignment - RESTfull - Asynchronous operation
 
