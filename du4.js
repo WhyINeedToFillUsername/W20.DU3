@@ -1,6 +1,8 @@
 const http = require("http");
 const storage = require("./storage").storage;
 
+const DELETION_TIMEOUT = 10000;
+
 http.createServer(function (req, res) {
     // log request object
     console.log("\nIncoming request: " + req.method + " " + req.url);
@@ -35,7 +37,11 @@ http.createServer(function (req, res) {
 
     function confirmDeletion(id) {
         console.log("Waiting for confirmation...\n");
-        setTimeout(function () {
+        setTimeout(afterDeletionConfirmed(id), DELETION_TIMEOUT)
+    }
+
+    function afterDeletionConfirmed(id) {
+        return function () {
             console.log("confirmed, deleting customer with id: " + id);
             if (storage.deleteCustomerById(id)) {
                 console.log("successfully deleted " + id);
@@ -45,7 +51,7 @@ http.createServer(function (req, res) {
             console.log("remaining customers:");
             console.log(storage.customers);
             console.log();
-        }, 10000)
+        }
     }
 
     function processDeleteRequest(req, res) {
