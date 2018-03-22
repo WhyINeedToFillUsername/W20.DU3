@@ -30,18 +30,34 @@ http.createServer(function (req, res) {
         }
     });
 
+    function confirmDeletion(id) {
+        console.log("Waiting for confirmation...\n");
+        setTimeout(function () {
+            console.log("confirmed, deleting customer with id: " + id);
+            if (storage.deleteCustomerById(id)){
+                console.log("successfully deleted " + id);
+            } else {
+                console.log(id + " already deleted");
+            }
+            console.log("remaining customers:");
+            console.log(storage.customers);
+            console.log();
+        }, 10000)
+    }
+
     function processRequest(req) {
         let subQuery = req.url.match("^/customer/(\\d+)?$");
         let id = parseInt(subQuery[1]);
 
         if (!isNaN(id)) {
-            if (storage.deleteCustomerById(id)) {
-                console.log("Deleted book with id " + id + ". Remaining customers:");
-                console.log(storage.customers);
-                return 204;
-            } else {
+            let i = storage.getCustomerIndex(id);
+            if (i === null) {
                 console.log("book with id " + id + " not found");
                 return 404;
+            } else {
+                console.log("Deleting customer with id " + id + "...");
+                confirmDeletion(id); // this will be done asynchronously
+                return 202;
             }
         }
         console.log("bad request");

@@ -13,10 +13,14 @@ exports.storage = {
         return null;
     },
 
+    deleteCustomerByIndex: function (i) {
+        this.customers.splice(i, 1);
+    },
+
     deleteCustomerById: function (id) {
         let i = this.getCustomerIndex(id);
         if (i !== null) {
-            this.customers.splice(i, 1);
+            this.deleteCustomerByIndex(i);
             return true;
         }
         return false;
