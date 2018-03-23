@@ -9,7 +9,11 @@ exports.storage = {
         let i = this.getRequestIndexByCustomerId(customerId);
         if (i !== null) return i;
 
-        this.requests.push({id: this.requestId, customerId: customerId, deleted: false});
+        this.requests.push({
+            id: this.requestId, customerId: customerId, deleted: false, "_links": [
+                {href: "/request/" + this.requestId, rel: "self"},
+            ]
+        });
         return this.requestId++;
     },
 

@@ -24,7 +24,6 @@ http.createServer(function (req, res) {
     req.on('end', function () {
         if (req.method === "DELETE") {
             processDeleteRequest(req, res);
-            res.end();
         } else if (req.method === "GET") {
             processGetRequest(req, res);
         } else {
@@ -66,15 +65,18 @@ http.createServer(function (req, res) {
             if (i === null) {
                 console.log("book with id " + id + " not found");
                 res.writeHead(404);
+                res.end();
             } else {
                 console.log("Deleting customer with id " + id + "...");
                 let reqId = storage.createDeleteRequest(id);
                 confirmDeletion(id); // this will be done asynchronously
-                res.writeHead(202, {'Location': '/request/' + reqId});
+                res.writeHead(202);
+                res.end(JSON.stringify(storage.requests[storage.getRequestIndexById(reqId)]));
             }
         } else {
             console.log("bad request");
             res.writeHead(400);
+            res.end();
         }
     }
 
