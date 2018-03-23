@@ -70,8 +70,10 @@ http.createServer(function (req, res) {
                 console.log("Deleting customer with id " + id + "...");
                 let reqId = storage.createDeleteRequest(id);
                 confirmDeletion(id); // this will be done asynchronously
-                res.writeHead(202);
-                res.end(JSON.stringify(storage.requests[storage.getRequestIndexById(reqId)]));
+
+                res.writeHead(202, {'Content-Type': 'application/json'});
+                let requestIndex = storage.getRequestIndexById(reqId);
+                res.end(JSON.stringify(storage.requests[requestIndex]));
             }
         } else {
             console.log("bad request");
