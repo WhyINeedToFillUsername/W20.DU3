@@ -5,15 +5,25 @@ exports.storage = {
     requests: [],
 
     createDeleteRequest: function (customerId) {
+        // if already exists
+        let i = this.getRequestIndexByCustomerId(customerId);
+        if (i !== null) return i;
+
         this.requests.push({id: this.requestId, customerId: customerId, deleted: false});
         return this.requestId++;
     },
 
-    // getRequestIndex: function (customerId) {
-    //     for (let i = 0; i < this.requests.length; i++)
-    //         if (this.requests[i].customerId === customerId) return i;
-    //     return null;
-    // },
+    getRequestIndexById: function (id) {
+        for (let i = 0; i < this.requests.length; i++)
+            if (this.requests[i].id === id) return i;
+        return null;
+    },
+
+    getRequestIndexByCustomerId: function (customerId) {
+        for (let i = 0; i < this.requests.length; i++)
+            if (this.requests[i].customerId === customerId) return i;
+        return null;
+    },
 
     closeRequestByCustomerId: function (customerId) {
         for (let i = 0; i < this.requests.length; i++)

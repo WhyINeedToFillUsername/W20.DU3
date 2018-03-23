@@ -1,7 +1,7 @@
 const http = require("http");
 const storage = require("./storage").storage;
 
-const DELETION_TIMEOUT = 5000;//TODO leave at 10000
+const DELETION_TIMEOUT = 10000;
 
 http.createServer(function (req, res) {
     // log request object
@@ -26,8 +26,7 @@ http.createServer(function (req, res) {
             processDeleteRequest(req, res);
             res.end();
         } else if (req.method === "GET") {
-            res.writeHead(processGetRequest(req));
-            res.end();
+            processGetRequest(req, res);
         } else {
             res.writeHead(405);
             console.log("method not allowed");
@@ -79,15 +78,25 @@ http.createServer(function (req, res) {
         }
     }
 
-    function processGetRequest(req) {
-        let i = storage.getCustomerIndex(id);
-        if (i === null) {
-            console.log("book with id " + id + " not found");
-            return 404;
+    function processGetRequest(req, res) {
+        let subQuery = req.url.match("^/request/(\\d+)?$");
+        let id = parseInt(subQuery[1]);
+
+        if (!isNaN(id)) {
+            let i = storage.getRequestIndexById(id);
+            if (i === null) {
+                console.log("request with id " + id + " not found");
+                res.writeHead(404);
+                res.end();
+            } else {
+                let request = storage.requests[i];
+                console.log("returning info about request: " + JSON.stringify(request));
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(request));
+            }
         } else {
-            console.log("Deleting customer with id " + id + "...");
-            confirmDeletion(id); // this will be done asynchronously
-            return 202;
+            console.log("bad request");
+            res.writeHead(400);
         }
     }
 }).listen(8080);
